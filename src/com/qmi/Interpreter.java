@@ -35,14 +35,32 @@ public class Interpreter implements Visitor{
 
     @Override
     public Object visitNode(OperationNode operationNode) {
-        double leftValue = (double) operationNode.getLeftTermNode().parseValue(this);
+        double leftValue = (double) operationNode.getleftNode().parseValue(this);
         if (operationNode.getOperation() == "") {
             return leftValue;
         }
-        double rightValue = (double) operationNode.getRightTermNode().parseValue(this);
+        double rightValue = (double) operationNode.getrightNode().parseValue(this);
         switch (operationNode.getOperation()) {
             case "+" : return leftValue + rightValue;
             case "-" : return leftValue - rightValue;
+            default:
+                try {
+                    throw new Exception("Unsupported operator");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitNode(TermNode termNode) {
+        double leftValue = (double) termNode.getleftNode().parseValue(this);
+        if (termNode.getOperation() == "") {
+            return leftValue;
+        }
+        double rightValue = (double) termNode.getrightNode().parseValue(this);
+        switch (termNode.getOperation()) {
             case "*" : return leftValue * rightValue;
             case "/" : return leftValue / rightValue;
             case "%" : return leftValue % rightValue;

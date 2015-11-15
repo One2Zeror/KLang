@@ -21,86 +21,126 @@ import java.util.ArrayList;
 //        Terminator          = ";"
 
 public class Parser {
-    private static ArrayList<Token> tokens;
-    private static int curTokenPos = 0;
+    private  ArrayList<Token> tokens;
+    private  int curTokenPos;
 
-    public static void setTokens(ArrayList<Token> tokens) {
-        Parser.tokens = tokens;
+    public Parser(ArrayList<Token> tokens) {
+        this.tokens = tokens;
+        this.curTokenPos = 0;
     }
 
-    public static ASTNode parse() {
+    public  ASTNode parse() {
         return parseExpressionListNode();
     }
 
-    private static ASTNode parseExpressionListNode() {
+    private  ASTNode parseExpressionListNode() {
         ArrayList<ASTNode> expressionNodes = new ArrayList<>();
-        while (curTokenPos < tokens.size()) {
+        while (this.curTokenPos < this.tokens.size()) {
             expressionNodes.add(parseExpressionNode());
             parseTerminal(TokenType.TERMINATOR);
         }
         return new ExpressionListNode(expressionNodes);
     }
 
-    private static ASTNode parseExpressionNode() {
-        if (tokens.get(curTokenPos + 1).getType() == TokenType.ASSIGN) {
+    private  ASTNode parseExpressionNode() {
+        if (this.tokens.get(this.curTokenPos + 1).getType() == TokenType.ASSIGN) {
             return parseAssignmentNode();
         }
         return parseOperationNode();
     }
 
-    private static ASTNode parseAssignmentNode() {
+    private  ASTNode parseAssignmentNode() {
         String varible = parseTerminal(TokenType.IDENTIFIER);
         parseTerminal(TokenType.ASSIGN);
         ASTNode operationNode = parseOperationNode();
         return new AssignmentNode(varible, operationNode);
     }
 
-    private static OperationNode parseOperationNode() {
-        ASTNode leftTermNode = parseTermNode();
-        if (checkTerminal(TokenType.TERMINATOR)) {
-            return new OperationNode(leftTermNode);
+    private  ASTNode parseOperationNode() {
+        ASTNode leftNode = parseTermNode();
+        if (isTerminal(TokenType.TERMINATOR)) {
+            return new OperationNode(leftNode);
         }
-        String op = parseTerminal(TokenType.OPERATOR);
-        ASTNode rightNode = parseTermNode();
-        return new OperationNode(leftTermNode, rightNode, op);
+        while (isTerminal("+") || isTerminal("-")) {
+            String op = parseTerminal();
+            ASTNode rightNode = parseTermNode();
+            leftNode = new OperationNode(leftNode, rightNode, op);
+        }
+        return leftNode;
     }
 
-    private static ASTNode parseTermNode() {
-        if (tokens.get(curTokenPos).getType() == TokenType.NUMBER) {
-            return new NumberNode(Double.valueOf(parseTerminal(TokenType.NUMBER)));
+    private  ASTNode parseTermNode() {
+        ASTNode leftNode = parseFactorNode();
+        if (isTerminal(TokenType.TERMINATOR)) {
+            return new TermNode(leftNode);
         }
-        if (tokens.get(curTokenPos).getType() == TokenType.IDENTIFIER) {
-            return new IdentifierNode(parseTerminal(TokenType.IDENTIFIER));
+        while (isTerminal("*") || isTerminal("/") || isTerminal("%")) {
+            String op = parseTerminal();
+            ASTNode rightNode = parseFactorNode();
+            leftNode = new TermNode(leftNode, rightNode, op);
         }
-        try {
-            throw new Exception("TermNode not match");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return leftNode;
     }
 
-    private static String parseTerminal(TokenType identifier) {
-        if (curTokenPos >= tokens.size()) {
-            try {
-                throw new Exception(String.format("Miss %s", identifier));
-            } catch (Exception e) {
-                e.printStackTrace();
+    private  ASTNode parseFactorNode() {
+        if (isTerminal(TokenType.NUMBER)) {
+            return new NumberNode(Double.valueOf(parseTerminal()));
+        }
+        if (isTerminal(TokenType.IDENTIFIER)) {
+            return new IdentifierNode(parseTerminal());
+        }
+        if (isTerminal("(")) {
+            eatToken();
+            ASTNode operationNode = parseOperationNode();
+            if (isTerminal(")")) {
+                eatToken();
+                return operationNode;
+            } else {
+                throw new Error("You may miss )");
             }
         }
-        if (tokens.get(curTokenPos).getType() != identifier) {
-            try {
-                throw new Exception("Terminal not match");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        String varible = tokens.get(curTokenPos).getValue();
-        curTokenPos++;
-        return varible;
+
+        throw new Error("FactorNode not match");
     }
 
-    private static boolean checkTerminal(TokenType identifier) {
-        return tokens.get(curTokenPos).getType() == identifier;
+    private  String lookAhead() {
+        return this.tokens.get(this.curTokenPos + 1).getValue();
+    }
+
+    private  void eatToken() {
+        this.curTokenPos++;
+    }
+
+
+    private  String parseTerminal() {
+        String value = this.tokens.get(this.curTokenPos).getValue();
+        this.curTokenPos++;
+        return value;
+    }
+
+
+    private  String parseTerminal(TokenType identifier) {
+        if (this.curTokenPos >= this.tokens.size()) {
+            throw new Error(String.format("Miss %s", identifier));
+        }
+        if (this.tokens.get(this.curTokenPos).getType() != identifier) {
+            throw new Error("Terminal not match");
+        }
+        String value = this.tokens.get(this.curTokenPos).getValue();
+        this.curTokenPos++;
+        return value;
+    }
+
+    private  boolean isTerminal(TokenType tokenType) {
+        return this.tokens.get(this.curTokenPos).getType() == tokenType;
+    }
+
+    private  boolean isTerminal(String tokenValue) {
+        return this.tokens.get(this.curTokenPos).getValue().equals(tokenValue);
+    }
+
+    private  boolean isTerminal(TokenType tokenType, String tokenValue) {
+        return this.tokens.get(this.curTokenPos).getType() == tokenType &&
+                this.tokens.get(this.curTokenPos).getValue().equals(tokenValue);
     }
 }

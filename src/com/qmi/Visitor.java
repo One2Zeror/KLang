@@ -9,10 +9,12 @@ public interface Visitor {
 
     Object visitNode(ExpressionListNode expressionListNode);
 
+    Object visitNode(OperationNode operationNode);
+
+    Object visitNode(TermNode termNode);
+
     Object visitNode(IdentifierNode identifierNode);
 
     Object visitNode(NumberNode numberNode);
-
-    Object visitNode(OperationNode operationNode);
 
 }

@@ -1,20 +1,20 @@
 package com.qmi;
 
 /**
- * Created by Administrator on 2015/11/12.
+ * Created by Administrator on 2015/11/15.
  */
-public class OperationNode implements ASTNode{
+public class TermNode implements ASTNode {
     private ASTNode leftNode;
     private ASTNode rightNode = null;
     private String  operation = "";
 
-    public OperationNode(ASTNode leftNode, ASTNode rightNode, String operation) {
+    public TermNode(ASTNode leftNode, ASTNode rightNode, String operation) {
         this.leftNode = leftNode;
         this.rightNode = rightNode;
         this.operation = operation;
     }
 
-    public OperationNode(ASTNode leftNode) {
+    public TermNode(ASTNode leftNode) {
         this.leftNode = leftNode;
     }
 

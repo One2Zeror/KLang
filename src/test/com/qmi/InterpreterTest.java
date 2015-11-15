@@ -33,17 +33,18 @@ public void after() throws Exception {
 public void testInterpret() throws Exception { 
 //TODO: Test goes here...
     String input =
-            //"11 + 1111;" +
-            //"12 * 10;" +
+            "11 + 1111;" +
+            "12 * 10;" +
             "k = 1210;" +
             "a = k / 10;" +
             "a = 11;" +
             "b = a * 8;" +
-            "b * b;"
+            "b * b;" +
+            "a = 10 + (6 + (8 * 1 - 7));"
             ;
     ArrayList<Token> tokens = Lexer.lex(input);
-    Parser.setTokens(tokens);
-    ExpressionListNode expressionListNode = (ExpressionListNode) Parser.parse();
+    Parser parser = new Parser(tokens);
+    ExpressionListNode expressionListNode = (ExpressionListNode) parser.parse();
     Interpreter interpreter = new Interpreter();
     ArrayList<Object> interpretResults = interpreter.interpret(expressionListNode);
 

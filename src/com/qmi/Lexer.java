@@ -17,8 +17,9 @@ import java.util.regex.Pattern;
 //        ExpressionList      = (Expression Terminator)+
 //        Expression          = Assignment | Operation
 //        Assignment          = Identifier AssignmentOperator Operation
-//        Operation           = Term (Operator Term)?
-//        Term                = Number | Identifier
+//        Operation           = Term ([+-] Term)?
+//        Term                = Factor ([*/%] Factor)?
+//        Factor                = Number | Identifier
 //        Number              = /\d+/
 //        Identifier          = /[_a-zA-Z][_a-zA-Z0-9]*/
 //        Operator            = /[+\-*\/]/
@@ -59,13 +60,8 @@ public class Lexer {
                 continue ;
             }
             if (matcher.group(TokenType.ERROR.name()) != null) {
-                System.out.println(String.format("Error: line %d, column %d, Not match: %s", Token.getErrorLine(),
+                throw new Error(String.format("Error: line %d, column %d, Not match: %s", Token.getErrorLine(),
                         Token.getErrorColumn(), matcher.group(TokenType.ERROR.name())));
-                try {
-                    throw new Exception(String.format("Not match: %s", matcher.group(TokenType.ERROR.name())));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
             for (TokenType tk : TokenType.values()) {
                 if (matcher.group(tk.name()) != null) {
