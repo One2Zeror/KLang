@@ -4,11 +4,15 @@ package com.qmi;
  * Created by Administrator on 2015/11/12.
  */
 public class Token {
+    private static int errorLine = 1;
+    private static int errorColumn = 1;
     private TokenType type;
     private String value;
 
-    private static int errorLine = 1;
-    private static int errorColumn = 1;
+    public Token(TokenType type, String value) {
+        this.type = type;
+        this.value = value;
+    }
 
     public static int getErrorLine() {
         return errorLine;
@@ -16,10 +20,6 @@ public class Token {
 
     public static void setErrorLine(int errorLine) {
         Token.errorLine = errorLine;
-    }
-
-    public static void setErrorColumn(int errorColumn) {
-        Token.errorColumn = errorColumn;
     }
 
     public static void increaseErrorLine() {
@@ -31,13 +31,12 @@ public class Token {
         return errorColumn;
     }
 
-    public static void increaseErrorColumn(int length) {
-        Token.errorColumn += length;
+    public static void setErrorColumn(int errorColumn) {
+        Token.errorColumn = errorColumn;
     }
 
-    public Token(TokenType type, String value) {
-        this.type = type;
-        this.value = value;
+    public static void increaseErrorColumn(int length) {
+        Token.errorColumn += length;
     }
 
     public TokenType getType() {

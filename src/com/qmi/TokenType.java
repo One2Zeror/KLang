@@ -39,14 +39,14 @@ sayHello(myName); // Prints 'Hello, Marco!'
 
 public enum TokenType {
     // Token types cannot have underscores
+    KEYWORD("if|else|while|for|continue|break|return|println"),
     NUMBER("-?[0-9]+"), OPERATOR("[*/%+-]"),
     IDENTIFIER("[_a-zA-Z][_a-zA-Z0-9]*"),
     ConditionalOperator("==|!=|<=|>=|<|>"),
     ASSIGN("="),
-    BRACKET("[(){}]"),
+    PUNCTUATOR("[(){};]"),
     NEWLINE("\n"),
     WHITESPACE("[ \t\f\r]+"),
-    TERMINATOR(";"),
     ERROR(".");
 
     public final String pattern;

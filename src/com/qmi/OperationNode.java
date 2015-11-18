@@ -3,10 +3,10 @@ package com.qmi;
 /**
  * Created by Administrator on 2015/11/12.
  */
-public class OperationNode implements ASTNode{
+public class OperationNode implements ASTNode {
     private ASTNode leftNode;
     private ASTNode rightNode = null;
-    private String  operation = "";
+    private String operation = "";
 
     public OperationNode(ASTNode leftNode, ASTNode rightNode, String operation) {
         this.leftNode = leftNode;

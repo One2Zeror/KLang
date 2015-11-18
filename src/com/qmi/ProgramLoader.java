@@ -12,7 +12,7 @@ public class ProgramLoader {
         File file = new File(path);
         try {
             InputStream in = new FileInputStream(file);
-            int flen = (int)file.length();
+            int flen = (int) file.length();
             strBuffer = new byte[flen];
             in.read(strBuffer, 0, flen);
         } catch (FileNotFoundException e) {

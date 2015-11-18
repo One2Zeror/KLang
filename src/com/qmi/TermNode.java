@@ -6,7 +6,7 @@ package com.qmi;
 public class TermNode implements ASTNode {
     private ASTNode leftNode;
     private ASTNode rightNode = null;
-    private String  operation = "";
+    private String operation = "";
 
     public TermNode(ASTNode leftNode, ASTNode rightNode, String operation) {
         this.leftNode = leftNode;

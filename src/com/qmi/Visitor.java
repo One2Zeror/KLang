@@ -5,9 +5,19 @@ package com.qmi;
  */
 public interface Visitor {
 
-    Object visitNode(AssignmentNode assignmentNode);
+    Object visitNode(Block block);
 
-    Object visitNode(ExpressionListNode expressionListNode);
+    Object visitNode(ForNode forNode);
+
+    Object visitNode(WhileNode whileNode);
+
+    Object visitNode(SelectionStatementNode selectionStatementNode);
+
+    Object visitNode(JumpStatementNode jumpStatementNode);
+
+    Object visitNode(IONode ioNode);
+
+    Object visitNode(AssignmentNode assignmentNode);
 
     Object visitNode(OperationNode operationNode);
 
@@ -16,5 +26,7 @@ public interface Visitor {
     Object visitNode(IdentifierNode identifierNode);
 
     Object visitNode(NumberNode numberNode);
+
+    Object visitNode(EmptyNode emptyNode);
 
 }

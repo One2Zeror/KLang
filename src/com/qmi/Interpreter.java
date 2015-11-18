@@ -1,7 +1,5 @@
 package com.qmi;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,21 +7,82 @@ import java.util.Map;
  * Created by Administrator on 2015/11/12.
  */
 
-public class Interpreter implements Visitor{
+public class Interpreter implements Visitor {
     private Map<String, Object> contex = new HashMap<>();
 
-    public ArrayList<Object> interpret(ExpressionListNode expressionListNode) {
-        ArrayList<Object> interpretResult = (ArrayList<Object>) expressionListNode.parseValue(this);
-        return interpretResult;
+    public void interpret(Block block) {
+        block.parseValue(this);
     }
 
     @Override
-    public Object visitNode(ExpressionListNode expressionListNode) {
-        ArrayList<Object> expressionResults = new ArrayList<>();
-        for (ASTNode astNode : expressionListNode.getExpressionNodes()) {
-            expressionResults.add(astNode.parseValue(this));
+    public Object visitNode(Block block) {
+        for (ASTNode statement : block.getStatements()) {
+            statement.parseValue(this);
         }
-        return expressionResults;
+        return null;
+    }
+
+    @Override
+    public Object visitNode(ForNode forNode) {
+        for (forNode.getInit().parseValue(this); isTrue(forNode.getCondition().parseValue(this)); forNode.getModify().parseValue(this)) {
+            for (ASTNode statement : forNode.getBody().getStatements()) {
+                if (statement instanceof JumpStatementNode) {
+                    if (((JumpStatementNode) statement).getType().equals("continue")) {
+                        break;
+                    }
+                    if (((JumpStatementNode) statement).getType().equals("break")) {
+                        return null;
+                    }
+                    if (((JumpStatementNode) statement).getType().equals("return")) {
+                        return null;
+                    }
+                }
+                statement.parseValue(this);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitNode(WhileNode whileNode) {
+        while (isTrue(whileNode.getCondition().parseValue(this))) {
+            for (ASTNode statement : whileNode.getBody().getStatements()) {
+                if (statement instanceof JumpStatementNode) {
+                    if (((JumpStatementNode) statement).getType().equals("continue")) {
+                        break;
+                    }
+                    if (((JumpStatementNode) statement).getType().equals("break")) {
+                        return null;
+                    }
+                    if (((JumpStatementNode) statement).getType().equals("return")) {
+                        return null;
+                    }
+                }
+                statement.parseValue(this);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitNode(SelectionStatementNode selectionStatementNode) {
+        if (isTrue(selectionStatementNode.getCondition().parseValue(this))) {
+            selectionStatementNode.getTrueStatement().parseValue(this);
+        } else {
+            selectionStatementNode.getFalseStatement().parseValue(this);
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitNode(JumpStatementNode jumpStatementNode) {
+        return null;
+    }
+
+    @Override
+    public Object visitNode(IONode ioNode) {
+        System.out.println(ioNode.getContentNode().parseValue(this));
+        return null;
     }
 
     @Override
@@ -36,16 +95,18 @@ public class Interpreter implements Visitor{
     @Override
     public Object visitNode(OperationNode operationNode) {
         double leftValue = (double) operationNode.getleftNode().parseValue(this);
-        if (operationNode.getOperation() == "") {
+        if (operationNode.getOperation().equals("")) {
             return leftValue;
         }
         double rightValue = (double) operationNode.getrightNode().parseValue(this);
         switch (operationNode.getOperation()) {
-            case "+" : return leftValue + rightValue;
-            case "-" : return leftValue - rightValue;
+            case "+":
+                return leftValue + rightValue;
+            case "-":
+                return leftValue - rightValue;
             default:
                 try {
-                    throw new Exception("Unsupported operator");
+                    Env.abort("Unsupported operator");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -56,20 +117,19 @@ public class Interpreter implements Visitor{
     @Override
     public Object visitNode(TermNode termNode) {
         double leftValue = (double) termNode.getleftNode().parseValue(this);
-        if (termNode.getOperation() == "") {
+        if (termNode.getOperation().equals("")) {
             return leftValue;
         }
         double rightValue = (double) termNode.getrightNode().parseValue(this);
         switch (termNode.getOperation()) {
-            case "*" : return leftValue * rightValue;
-            case "/" : return leftValue / rightValue;
-            case "%" : return leftValue % rightValue;
+            case "*":
+                return leftValue * rightValue;
+            case "/":
+                return leftValue / rightValue;
+            case "%":
+                return leftValue % rightValue;
             default:
-                try {
-                    throw new Exception("Unsupported operator");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                Env.abort("Unsupported operator");
         }
         return null;
     }
@@ -79,17 +139,22 @@ public class Interpreter implements Visitor{
         if (this.contex.containsKey(identifierNode.getValue())) {
             return this.contex.get(identifierNode.getValue());
         }
-        try {
-            throw new Exception(String.format("No such varible: %s", identifierNode.getValue()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Env.abort(String.format("Uninitialized Varible: %s ", identifierNode.getValue()));
         return null;
     }
 
     @Override
     public Object visitNode(NumberNode numberNode) {
         return numberNode.getValue();
+    }
+
+    @Override
+    public Object visitNode(EmptyNode emptyNode) {
+        return null;
+    }
+
+    private boolean isTrue(Object o) {
+        return o == Boolean.TRUE || (double) o != 0;
     }
 
 }

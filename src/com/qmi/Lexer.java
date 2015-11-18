@@ -1,7 +1,5 @@
 package com.qmi;
 
-import com.sun.corba.se.impl.oa.toa.TOA;
-
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,30 +7,6 @@ import java.util.regex.Pattern;
 /**
  * Created by Administrator on 2015/11/12.
  */
-
-
-//        KLang = (Instruction)+
-//        Instruction    = (Expression Terminator) | Statement
-
-//        ExpressionList      = (Expression Terminator)+
-//        Expression          = Assignment | Operation
-//        Assignment          = Identifier AssignmentOperator Operation
-//        Operation           = Term ([+-] Term)?
-//        Term                = Factor ([*/%] Factor)?
-//        Factor                = Number | Identifier
-//        Number              = /\d+/
-//        Identifier          = /[_a-zA-Z][_a-zA-Z0-9]*/
-//        Operator            = /[+\-*\/]/
-//        AssignementOperator = "="
-//        Terminator          = ";"
-
-//        Statement             = IfStatement | WhileStatement
-//        IfStatement           = 'if' '(' ConditionalExpression ')' Block
-//        WhileStatement        = 'while' '(' ConditionalExpression ')' Block
-//        ConditionalExpression = Expression ConditionalOperator Expression
-//        Block                 = '{' ExpressionList '}'
-//        ConditionalOperator   = /==|!=|<=|>=|<|>/
-
 
 public class Lexer {
     public static ArrayList<Token> lex(String input) {
@@ -52,12 +26,12 @@ public class Lexer {
                 //tokens.add(new Token(TokenType.NEWLINE, matcher.group(TokenType.NEWLINE.name())));
                 Token.increaseErrorLine();
                 Token.setErrorColumn(1);
-                continue ;
+                continue;
             }
             if (matcher.group(TokenType.WHITESPACE.name()) != null) {
                 Token.increaseErrorColumn(matcher.group(TokenType.WHITESPACE.name()).length());
                 //tokens.add(new Token(TokenType.WHITESPACE, matcher.group(TokenType.WHITESPACE.name())));
-                continue ;
+                continue;
             }
             if (matcher.group(TokenType.ERROR.name()) != null) {
                 throw new Error(String.format("Error: line %d, column %d, Not match: %s", Token.getErrorLine(),
